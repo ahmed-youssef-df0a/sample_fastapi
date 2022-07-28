@@ -52,3 +52,19 @@ class UserLogin(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+    class Config:
+        orm_mode = True
+
+
+class TokenData(BaseModel):
+    user_id: int
+
+    class Config:
+        orm_mode = True

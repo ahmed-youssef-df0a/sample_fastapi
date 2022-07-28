@@ -58,7 +58,7 @@ def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 def check_user(db: Session, user_credentials : schemas.UserLogin):
-    user = db.query(models.User).filter(models.User.email == user_credentials.email).first()
+    user = db.query(models.User).filter(models.User.email == user_credentials.username).first()
     if user and verify_password(user_credentials.password, user.password):
         return user
     return None
