@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 
 from . import models, schemas
-from .utils import get_password_hash
+from .utils import get_password_hash, verify_password
 
 
 
@@ -56,3 +56,9 @@ def create_user(db: Session, user: schemas.UserBase):
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
+
+def check_user(db: Session, user_credentials : schemas.UserLogin):
+    user = db.query(models.User).filter(models.User.email == user_credentials.email).first()
+    if user and verify_password(user_credentials.password, user.password):
+        return user
+    return None
