@@ -1,4 +1,5 @@
 
+from fastapi import HTTPException , status
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -17,31 +18,38 @@ def get_posts(db: Session, skip: int = 0, limit: int = 100):
     posts=db.query(models.Posts).offset(skip).limit(limit).all()
     return posts
 
-def create_post(db: Session, post: schemas.PostBase):
-    the_post = models.Posts(**post.dict())
+def create_post(db: Session, post: schemas.PostBase , current_user : int):
+    the_post = models.Posts(**post.dict() , user_id=current_user)
     db.add(the_post)
     db.commit()
     db.refresh(the_post)
     return the_post
 
 
-def delete_post(db: Session, post_id: int):
+def delete_post(db: Session, post_id: int ,current_user : int):
     the_post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
-    if the_post:
-        db.delete(the_post)
-        db.commit()
-        return True
+    if the_post :
+        if the_post.user_id == current_user:
+            db.delete(the_post)
+            db.commit()
+            return True
+        else:
+            raise  HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorithed for this action")
+
     return False
 
-def update_post(db: Session, post_id: int, post: schemas.PostBase):
+def update_post(db: Session, post_id: int, post: schemas.PostBase ,current_user : int):
     the_post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
-    if the_post:
-        the_post.title = post.title
-        the_post.content = post.content
-        the_post.published = post.published
-        db.commit()
-        db.refresh(the_post)
-        return the_post
+    if the_post :
+        if the_post.user_id == current_user:
+            the_post.title = post.title
+            the_post.content = post.content
+            the_post.published = post.published
+            db.commit()
+            db.refresh(the_post)
+            return the_post
+        else:
+            raise  HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorithed for this action")
     return None
 
 # User

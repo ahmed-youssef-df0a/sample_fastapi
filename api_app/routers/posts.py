@@ -28,19 +28,19 @@ async def get_post(post_id: int, db: Session = Depends(get_db), current_user: in
 
 @router.post("/", response_model=schemas.PostInDB , status_code=status.HTTP_201_CREATED)
 async def create_post(post: schemas.PostBase, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    return crud.create_post(db=db, post=post)
+    return crud.create_post(db=db, post=post,current_user=current_user)
 
 
 @router.delete("/{post_id}")
 async def delete_post(post_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    deleted_post = crud.delete_post(db=db, post_id=post_id)
+    deleted_post = crud.delete_post(db=db, post_id=post_id,current_user=current_user)
     if not deleted_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{post_id}", response_model=schemas.PostInDB) 
 async def update_post(post_id: int, post: schemas.PostBase, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    updated_post = crud.update_post(db=db, post_id=post_id, post=post)
+    updated_post = crud.update_post(db=db, post_id=post_id, post=post ,current_user=current_user)
     if not updated_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
     return updated_post
