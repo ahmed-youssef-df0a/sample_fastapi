@@ -1,6 +1,6 @@
 from .. import crud, schemas , oauth2
 from ..database import  get_db
-from typing import List
+from typing import List, Optional
 from fastapi import  Response , status , HTTPException , Depends , APIRouter
 from sqlalchemy.orm import Session 
 
@@ -12,9 +12,13 @@ router = APIRouter(
 
 
 @router.get("/" , response_model=List[schemas.PostInDB])
-async def get_posts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+async def get_posts(skip: int = 0, db: Session = Depends(get_db),
+                    current_user: int = Depends(oauth2.get_current_user),
+                    limit : int = 10,
+                    search : Optional[str] = ""
+                    ):
     
-    posts = crud.get_posts(db, skip=skip, limit=limit)
+    posts = crud.get_posts(db, skip=skip, limit=limit, search=search)
 
     return  posts
 

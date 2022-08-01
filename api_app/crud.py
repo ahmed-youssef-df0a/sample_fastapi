@@ -1,4 +1,5 @@
 
+from typing import Optional
 from fastapi import HTTPException , status
 from sqlalchemy.orm import Session
 
@@ -14,8 +15,8 @@ from .utils import get_password_hash, verify_password
 def get_post(db: Session, post_id: int):
     return db.query(models.Posts).filter(models.Posts.id == post_id).first()
 
-def get_posts(db: Session, skip: int = 0, limit: int = 100):
-    posts=db.query(models.Posts).offset(skip).limit(limit).all()
+def get_posts(db: Session, skip: int = 0, limit: int = 100, search : Optional[str] = ""):
+    posts=db.query(models.Posts).filter(models.Posts.title.contains(search)).order_by(models.Posts.created_at.asc()).offset(skip).limit(limit).all()
     return posts
 
 def create_post(db: Session, post: schemas.PostBase , current_user : int):
