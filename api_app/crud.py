@@ -1,6 +1,6 @@
 
 from typing import Optional
-from fastapi import HTTPException , status
+from fastapi import HTTPException, Response , status
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -71,3 +71,30 @@ def check_user(db: Session, user_credentials : schemas.UserLogin):
     if user and verify_password(user_credentials.password, user.password):
         return user
     return None
+
+
+def create_vote(db: Session, vote: schemas.Vote , current_user : int):
+    #check if post_id exists
+    the_post = db.query(models.Posts).filter(models.Posts.id == vote.post_id).first() 
+    if the_post :
+        the_vote = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user)
+        
+        
+        if vote.dir == 1:
+            if the_vote.first() :
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You already voted for this post")
+            new_vote = models.Vote(post_id=vote.post_id, user_id=current_user)
+            db.add(new_vote)
+            db.commit()
+            db.refresh(new_vote)
+            return { "message" : "Vote created" , "vote" : new_vote } 
+        else:
+            if not the_vote.first() :
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="You haven't voted for this post")
+            else:
+                the_vote.delete(synchronize_session=False)
+                db.commit()
+                return Response(status_code=status.HTTP_204_NO_CONTENT)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+

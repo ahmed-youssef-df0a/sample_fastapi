@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import List, Optional
 
 
 
@@ -69,3 +69,10 @@ class PostInDB(PostBase,PostCreate):
     class Config:
         orm_mode = True
 
+
+class Vote(BaseModel):
+    post_id: int
+    dir:  bool
+
+    class Config:
+        orm_mode = True

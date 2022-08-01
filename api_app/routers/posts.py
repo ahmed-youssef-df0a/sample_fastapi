@@ -18,9 +18,7 @@ async def get_posts(skip: int = 0, db: Session = Depends(get_db),
                     search : Optional[str] = ""
                     ):
     
-    posts = crud.get_posts(db, skip=skip, limit=limit, search=search)
-
-    return  posts
+    return  crud.get_posts(db, skip=skip, limit=limit, search=search)
 
 
 @router.get("/{post_id}", response_model=schemas.PostInDB)
