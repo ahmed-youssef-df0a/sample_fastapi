@@ -66,6 +66,14 @@ class PostInDB(PostBase,PostCreate):
     created_at: datetime
     user_owner : UserResponse
 
+
+    class Config:
+        orm_mode = True
+
+class PostOut(BaseModel):
+    Posts : PostInDB
+    vote_count : int
+
     class Config:
         orm_mode = True
 

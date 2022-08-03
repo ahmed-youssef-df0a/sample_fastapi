@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/" , response_model=List[schemas.PostInDB])
+@router.get("/" , response_model=List[schemas.PostOut])
 async def get_posts(skip: int = 0, db: Session = Depends(get_db),
                     current_user: int = Depends(oauth2.get_current_user),
                     limit : int = 10,
@@ -21,7 +21,7 @@ async def get_posts(skip: int = 0, db: Session = Depends(get_db),
     return  crud.get_posts(db, skip=skip, limit=limit, search=search)
 
 
-@router.get("/{post_id}", response_model=schemas.PostInDB)
+@router.get("/{post_id}", response_model=schemas.PostOut)
 async def get_post(post_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = crud.get_post(db, post_id=post_id)
     if not post:
