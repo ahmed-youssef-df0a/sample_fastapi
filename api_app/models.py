@@ -2,8 +2,9 @@ import datetime
 from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String , ForeignKey, text
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base()
 class Posts(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True)
@@ -11,6 +12,7 @@ class Posts(Base):
     content = Column(String, nullable=False)
     published = Column(Boolean, nullable=False,  server_default=text('True'))
     created_at = Column(TIMESTAMP , nullable=False, server_default=text('now()'))
+    template = Column(String, nullable=False,  server_default=text("'default'"))
     user_id =  Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     user_owner =  relationship("User")
 
